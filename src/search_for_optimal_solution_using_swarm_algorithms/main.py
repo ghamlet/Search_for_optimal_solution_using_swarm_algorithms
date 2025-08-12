@@ -6,6 +6,8 @@ from flight_utils import load_flight_coordinates
 from object_detection_controller import ObjectDetectionController
 import numpy as np
 
+
+
 class MissionController:
     def __init__(self, drone: Pion):
         """
@@ -42,7 +44,7 @@ class MissionController:
                 print(f"Перелет {i}/{len(self.mission_points)} -> X:{x:.1f}, Y:{y:.1f}, Z:{z:.1f}")
                 
                 # Перелет к точке с ожиданием достижения
-                self.drone.goto(x, y, z, yaw=0, wait=True, accuracy=0.2)
+                self.drone.goto(x, y, z, yaw=0, accuracy=0.2)
                 
                 # Короткая пауза для стабилизации
                 time.sleep(0.3)
@@ -53,17 +55,14 @@ class MissionController:
             print(f"Ошибка выполнения миссии: {str(e)}")
             raise
     
-    def stop_mission(self):
-        """Экстренная остановка миссии"""
-        self.stop_event.set()
-        self.drone.stop_moving()
+    
 
 
-def print_position(pioneer, stop_event):
-    """Функция для вывода координат в отдельном потоке"""
-    while not stop_event.is_set():
-        print(f"Текущие координаты: xyz {np.round(pioneer.position[0:3], 3)}")
-        time.sleep(1)  # Интервал обновления (1 секунда)
+# def print_position(pioneer, stop_event):
+#     """Функция для вывода координат в отдельном потоке"""
+#     while not stop_event.is_set():
+#         print(f"Текущие координаты: xyz {np.round(pioneer.position[0:3], 3)}")
+#         time.sleep(1)  # Интервал обновления (1 секунда)
 
 
 
@@ -73,16 +72,21 @@ def main():
     pioneer = Pion(ip="127.0.0.1", mavlink_port=8000, logger=True)
     # pioneer = Pion(ip="10.1.100.160", mavlink_port=5656, logger=True)
 
-
-    position_stop_event = threading.Event()
+    CAMERA_SOURCE = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/videos/output_pascal_line2.mp4"
+    MODEL_PATH = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/weights/best_first.pt"
     
-    # Запускаем поток вывода координат
-    position_thread = threading.Thread(
-        target=print_position,
-        args=(pioneer, position_stop_event),
-        daemon=True
-    )
-    position_thread.start()
+    # CAMERA_SOURCE = "rtsp://10.1.100.160/8585/pioneer_stream"
+
+
+    # position_stop_event = threading.Event()
+    
+    # # Запускаем поток вывода координат
+    # position_thread = threading.Thread(
+    #     target=print_position,
+    #     args=(pioneer, position_stop_event),
+    #     daemon=True
+    # )
+    # position_thread.start()
 
     
     try:
@@ -106,8 +110,8 @@ def main():
         # Создание контроллера детекции
         detector = ObjectDetectionController(
             pioneer=pioneer,
-            camera_source="/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/videos/output_pascal_line2.mp4",  # Веб-камера
-            model_path="/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/weights/best_first.pt",
+            camera_source=CAMERA_SOURCE,  # Веб-камера
+            model_path=MODEL_PATH,
             conf_threshold=0.6,
             min_detections=3,
             buffer_size=15
@@ -126,6 +130,7 @@ def main():
 
 
 
+
         mission.execute_mission()
         
         print("Посадка...")
@@ -140,8 +145,8 @@ def main():
         mission.stop_mission()
     finally:
          # Остановка потока вывода координат
-        position_stop_event.set()
-        position_thread.join()
+        # position_stop_event.set()
+        # position_thread.join()
         print("Завершение работы...")
         pioneer.disarm()
         pioneer.stop()
