@@ -1,18 +1,16 @@
-[project]
+[tool.poetry]
 name = "search-for-optimal-solution-using-swarm-algorithms"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "ghamlet",email = "dmtr317744@gmail.com"}
-]
+authors = ["ghamlet <dmtr317744@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "pionsdk (>=0.0.11,<0.0.12)"
+packages = [
+    { include = "search_for_optimal_solution_using_swarm_algorithms", from = "src" }
 ]
 
-[tool.poetry]
-packages = [{include = "search_for_optimal_solution_using_swarm_algorithms", from = "src"}]
+[tool.poetry.dependencies]
+python = ">=3.10"
+pionsdk = "0.0.11"
 
 
 [build-system]

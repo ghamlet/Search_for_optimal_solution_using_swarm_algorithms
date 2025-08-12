@@ -1,0 +1,122 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+yolov11_env
+
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files
+*.csv
+*.json
+*.hdf5
+*.h5
+*.pkl
+*.pickle
+*.mp4
+*.avi
+*.mov
+*.jpg
+*.png
+*.jpeg
+*.log
+*.bag  # ROS bag files
+
+# Model weights
+*.pt
+*.pth
+*.weights
+*.onnx
+*.tflite
+
+# ROS
+build/
+devel/
+install/
+
+# MAVLink
+*.mavlink
+
+# Drone/Simulator specific
+*.ulg  # PX4 log files
+*.tlog  # MAVLink telemetry logs
+*.mission
+*.plan
+*.qgc
+
+# Config files
+*.config
+*.yaml
+*.yml
+config.json
+settings.ini
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Exceptions (разкомментируйте если нужно сохранить какие-то из этих файлов)
+# !example_config.yaml
+# !important_mission.plan
