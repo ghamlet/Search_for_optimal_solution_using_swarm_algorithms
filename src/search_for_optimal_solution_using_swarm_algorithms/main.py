@@ -5,55 +5,10 @@ from pion import Pion
 from flight_utils import load_flight_coordinates
 from object_detection_controller import ObjectDetectionController
 import numpy as np
+from flight_mission_runner import FlightMissionRunner
 
 
 
-class MissionController:
-    def __init__(self, drone: Pion):
-        """
-        Инициализация контроллера миссии
-        
-        :param drone: экземпляр дрона Pion
-        """
-        self.drone = drone
-        self.mission_points = []
-        self.stop_event = threading.Event()
-    
-    def load_mission(self, points: List[Tuple[float, float, float]]):
-        """
-        Загрузка маршрута из списка точек
-        
-        :param points: список точек в формате [(x1, y1, z1), (x2, y2, z2), ...]
-        """
-        self.mission_points = points
-    
-    def execute_mission(self):
-        """Выполнение полета по загруженному маршруту"""
-        if not self.mission_points:
-            print("Ошибка: маршрут не загружен!")
-            return
-        
-        try:
-            print(f"Начало миссии ({len(self.mission_points)} точек)")
-            
-            for i, (x, y, z) in enumerate(self.mission_points, 1):
-                if self.stop_event.is_set():
-                    print("Миссия прервана")
-                    break
-                    
-                print(f"Перелет {i}/{len(self.mission_points)} -> X:{x:.1f}, Y:{y:.1f}, Z:{z:.1f}")
-                
-                # Перелет к точке с ожиданием достижения
-                self.drone.goto(x, y, z, yaw=0, accuracy=0.2)
-                
-                # Короткая пауза для стабилизации
-                time.sleep(0.3)
-            
-            print("Миссия успешно завершена")
-            
-        except Exception as e:
-            print(f"Ошибка выполнения миссии: {str(e)}")
-            raise
     
     
 
@@ -90,12 +45,10 @@ def main():
 
     
     try:
-        # Создание контроллера миссии
-        mission = MissionController(drone=pioneer)
+        MAP_POINTS = load_flight_coordinates("flight_path.json")
+        mission = FlightMissionRunner(MAP_POINTS)
+
         
-        # Пример маршрута (можно загрузить из JSON)
-        flight_path = load_flight_coordinates("flight_path.json")
-        mission.load_mission(flight_path)
         
         # Запуск миссии
         print("Армирование дрона...")
@@ -119,14 +72,14 @@ def main():
         
         # Запуск детекции в фоновом режиме
                 # Запуск детекции в фоновом режиме
-        detector.start()
+        # detector.start()
 
-        # Запуск отображения в отдельном потоке
-        display_thread = threading.Thread(
-            target=detector.show_detection,
-            daemon=True
-        )
-        display_thread.start()
+        # # Запуск отображения в отдельном потоке
+        # display_thread = threading.Thread(
+        #     target=detector.show_detection,
+        #     daemon=True
+        # )
+        # display_thread.start()
 
 
 
