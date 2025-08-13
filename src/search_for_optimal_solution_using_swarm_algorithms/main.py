@@ -167,6 +167,27 @@ def main():
     except KeyboardInterrupt:
         print("\nМиссия прервана пользователем")
         stop_event.set()
+
+        if 'mission_thread' in locals():
+            mission_thread.join(timeout=2)
+        if 'display_thread' in locals():
+            display_thread.join(timeout=2)
+
+        try:
+            print("Посадка...")
+            pioneer.land()
+            time.sleep(4)
+        except Exception as e:
+            print(f"Ошибка при посадке: {e}")
+        finally:
+            try:
+                pioneer.disarm()
+            except Exception:
+                pass
+            try:
+                pioneer.stop()
+            except Exception:
+                pass
     except Exception as e:
         print(f"\nОшибка: {str(e)}")
         stop_event.set()
@@ -182,8 +203,6 @@ def main():
 
         print("Завершение работы...")
         try:
-            pioneer.land()
-            time.sleep(4)
             pioneer.disarm()
         except Exception:
             pass
