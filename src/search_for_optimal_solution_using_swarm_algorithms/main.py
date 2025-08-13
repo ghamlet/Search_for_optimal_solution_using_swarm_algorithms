@@ -108,8 +108,8 @@ def main():
 
     
     # Конфигурация детекции
-    CAMERA_SOURCE = "rtsp://10.1.100.160:8554/pioneer_stream"
-    # CAMERA_SOURCE = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/videos/output_pascal_line2.mp4"  # сократил путь для читаемости
+    # CAMERA_SOURCE = "rtsp://10.1.100.160:8554/pioneer_stream"
+    CAMERA_SOURCE = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/videos/output_pascal_line2.mp4"  # сократил путь для читаемости
     MODEL_PATH = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/weights/best_last_sana.pt"
     
     # Единое стоп-событие для всех потоков
@@ -182,6 +182,8 @@ def main():
 
         print("Завершение работы...")
         try:
+            pioneer.land()
+            time.sleep(4)
             pioneer.disarm()
         except Exception:
             pass
