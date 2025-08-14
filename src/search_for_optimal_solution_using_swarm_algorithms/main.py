@@ -17,7 +17,20 @@ class MissionController:
     def load_mission(self, points: List[Tuple[float, float, float]]):
         self.mission_points = points
 
-    def execute_mission_non_blocking(self, stop_event: threading.Event, detection_event: threading.Event, stop_on_detection: bool):
+
+    def execute_mission_non_blocking(self, stop_event: threading.Event, 
+                               detection_event: threading.Event, 
+                               stop_on_detection: bool,
+                               pioneer: Pion = None):
+        """
+        Выполняет миссию в неблокирующем режиме с возможностью посадки дрона
+        
+        Args:
+            stop_event: событие для остановки миссии
+            detection_event: событие обнаружения объекта
+            stop_on_detection: флаг остановки при обнаружении
+            pioneer: объект дрона Pioneer (опционально)
+        """
         if not self.mission_points:
             print("Ошибка: маршрут не загружен!")
             return
@@ -49,11 +62,27 @@ class MissionController:
                         break
                     time.sleep(0.01)
 
+            # Логика завершения миссии
             if not detection_event.is_set() and self.current_point_index >= len(self.mission_points):
                 print("Миссия успешно завершена")
+                if pioneer is not None:
+                    try:
+                        print("Выполняем посадку...")
+                        pioneer.land()
+                        time.sleep(3)  # Даем время на посадку
+                    except Exception as e:
+                        print(f"Ошибка при посадке: {e}")
 
         except Exception as e:
             print(f"Ошибка выполнения миссии: {e}")
+            if pioneer is not None:
+                try:
+                    print("Аварийная посадка...")
+                    pioneer.land()
+                except Exception as e:
+                    print(f"Ошибка при аварийной посадке: {e}")
+
+
 
     def _approach_cow_logic(self, stop_event: threading.Event):
         """Логика сближения с коровой для направления её в загон."""
@@ -133,7 +162,7 @@ class MissionController:
             
             # 2. Сразу летим к корове на высоте 0.4м
             print("2. Перелет к корове на высоте 0.4м...")
-            self.drone.goto(cow_x, cow_y, 0.4, yaw=0, wait=True, accuracy=0.2)
+            self.drone.goto(cow_x, cow_y, 0.7, yaw=0, wait=True, accuracy=0.2)
             
             if stop_event.is_set():
                 return
@@ -155,6 +184,7 @@ class MissionController:
     def stop_mission(self):
         self.stop_event.set()
         self.drone.stop_moving()
+
 
 def display_and_process_detections(detector: ObjectDetectionController, pioneer: Pion, stop_event):
     """Цикл отображения и обработки детекций"""
@@ -178,12 +208,15 @@ def cow_detection_loop(detector: ObjectDetectionController, detection_event: thr
 
 def main():
     # Инициализация дрона
-    pioneer = Pion(ip="127.0.0.1", mavlink_port=8005, logger=True, dt=0.0, mass=0.5)
+    pioneer = Pion(ip="127.0.0.1", mavlink_port=8004, logger=True, dt=0.0, mass=0.5)
     
     # Конфигурация детекции
+    # CAMERA_SOURCE = "rtsp://10.1.100.160:8554/pioneer_stream"  # или путь к видеофайлу
     CAMERA_SOURCE = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/videos/output_pascal_line2.mp4"  # или путь к видеофайлу
+
     MODEL_PATH = "/home/arrma/PROGRAMMS/Search_for_optimal_solution_using_swarm_algorithms/src/search_for_optimal_solution_using_swarm_algorithms/weights/best_last_sana.pt"  # путь к модели YOLO
     
+
     # Единое стоп-событие для всех потоков
     stop_event = threading.Event()
     detection_event = threading.Event()
@@ -216,25 +249,36 @@ def main():
     detection_thread.start()
 
     try:
-        # Инициализация миссии
+       # Инициализация миссии
         mission = MissionController(drone=pioneer)
         mission._detector = detector  # Передаем детектор в миссию
         flight_path = load_flight_coordinates("flight_path.json")
         mission.load_mission(flight_path)
 
+        
+
+
         print("Армирование дрона...")
         pioneer.arm()
         print("Взлет...")
         pioneer.takeoff()
-        time.sleep(2)
+        time.sleep(7)
 
-        # Запуск миссии в отдельном потоке
+
+        # Запускаем миссию в отдельном потоке
         mission_thread = threading.Thread(
             target=mission.execute_mission_non_blocking,
-            args=(stop_event, detection_event, True),  # True = stop_on_detection
+            kwargs={
+                'stop_event': stop_event,
+                'detection_event': detection_event,
+                'stop_on_detection': True,
+                'pioneer': pioneer  # Передаем объект пионера
+            },
             daemon=True
         )
         mission_thread.start()
+
+       
 
         # Основной цикл ожидания завершения миссии или команды остановки
         while mission_thread.is_alive() and not stop_event.is_set():
