@@ -224,10 +224,10 @@ class ObjectDetectionController:
 
     def get_global_coordinates(self, center: Tuple[int, int], drone_x: float, drone_y: float) -> Tuple[float, float]:
         """Вычисляет глобальные координаты на основе позиции дрона."""
-        img_width, img_height = 640, 480
+        img_width, img_height = 640, 640
         img_mid_x, img_mid_y = img_width / 2, img_height / 2
-        scale_x = 2.4 / img_width
-        scale_y = 1.4 / img_height
+        scale_x = 1 / img_width
+        scale_y = 1 / img_height
         global_x = drone_x + (center[0] - img_mid_x) * scale_x
         global_y = drone_y - (center[1] - img_mid_y) * scale_y
         return global_x, global_y
