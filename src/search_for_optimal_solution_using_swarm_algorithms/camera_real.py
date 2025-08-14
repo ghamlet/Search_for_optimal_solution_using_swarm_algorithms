@@ -2,7 +2,8 @@ from typing import Dict, List, Optional, Tuple
 import cv2
 from numpy.typing import NDArray
 
-class Camera:
+
+class CameraReal:
     def __init__(self, source: str):
         self.source = source
         self.is_video_file = not source.startswith(('rtsp://', 'http://', 'https://'))

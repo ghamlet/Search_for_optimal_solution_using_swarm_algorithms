@@ -3,7 +3,7 @@ import time
 import numpy as np
 from collections import deque, defaultdict
 from typing import List, Dict, Optional, Any
-from camera import Camera
+from camera_real import CameraReal
 from yolo_detector import YOLODetector
 
 
@@ -23,7 +23,7 @@ class ObjectDetectionController:
         self.buffer_size = buffer_size
         
         # Инициализация компонентов
-        self.camera = Camera(source=camera_source)
+        self.camera = CameraReal(source=camera_source)
         self.detector = YOLODetector(model_path=model_path, conf_threshold=conf_threshold)
         self.class_names = self.detector.class_names
         

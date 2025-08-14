@@ -162,7 +162,7 @@ def run_loop(cam: BaseCamera, show_window: bool = True, record_video: bool = Tru
 
 def main():
     parser = argparse.ArgumentParser(description="Run camera reader")
-    parser.add_argument("--ip", type=str, help="IP", default="10.1.100.160")
+    parser.add_argument("--ip", type=str, help="IP", default="10.1.100.237")
     parser.add_argument("--port", type=int, help="порт", default="8554")
     parser.add_argument(
         "--headless",
