@@ -391,13 +391,13 @@ class NeuralObjectDetectionController:
         Returns:
             Глобальные координаты (x, y) в метрах
         """
-        img_width, img_height = 640, 480  # Предполагаемый размер кадра
+        img_width, img_height = 640, 640  # Предполагаемый размер кадра
         img_mid_x, img_mid_y = img_width / 2, img_height / 2
         
         # Коэффициенты преобразования пикселей в метры
         # (подбираются экспериментально для вашей высоты полета)
-        scale_x = 2.4 / img_width  # метра на пиксель по X
-        scale_y = 1.4 / img_height  # метра на пиксель по Y
+        scale_x = 0.9 / img_width  # метра на пиксель по X
+        scale_y = 0.9 / img_height  # метра на пиксель по Y
         
         # Вычисляем смещение от центра кадра
         dx = (center[0] - img_mid_x) * scale_x
