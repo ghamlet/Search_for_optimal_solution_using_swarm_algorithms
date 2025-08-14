@@ -9,6 +9,7 @@ from flight_utils import load_flight_coordinates
 from camera_sim import CameraSim
 from object_detection_controller_sim import ObjectDetectionControllerSim
 import math
+from camera_real import CameraReal
 
 
 
@@ -454,10 +455,11 @@ class MissionControllerSim:
 
 def main():
     # Дрон (как в основном файле, но без arm/takeoff/land)
-    pioneer = Pion(ip="127.0.0.1", mavlink_port=8001, logger=True, dt=0.0, mass=0.5)
+    pioneer = Pion(ip="127.0.0.1", mavlink_port=8004, logger=True, dt=0.0, mass=0.5)
 
     # Камера-симулятор и контроллер детекции с подтверждением
-    camera = CameraSim(timeout=1, ip='127.0.0.1', port=18001, video_buffer_size=65000, log_connection=True)
+    camera = CameraSim(timeout=1, ip='127.0.0.1', port=18004, video_buffer_size=65000, log_connection=True)
+    # camera = CameraReal("rtsp://10.1.100.160:8554/pioneer_stream")
 
     # События должны быть созданы до передачи в детектор
     stop_event = threading.Event()
